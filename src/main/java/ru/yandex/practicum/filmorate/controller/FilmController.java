@@ -50,7 +50,7 @@ public class FilmController {
             if (films.containsKey(newFilm.getId())) {
                 Film oldFilm = films.get(newFilm.getId());
 
-                if (newFilm.getDescription() != null &&newFilm.getDescription().length() > 200 ||
+                if (newFilm.getDescription() != null && newFilm.getDescription().length() > 200 ||
                         newFilm.getReleaseDate() != null && newFilm.getReleaseDate().isBefore(startDate) ||
                         newFilm.getDuration() != null && newFilm.getDuration().toMinutes() < 0) {
                     log.error("Описание фильма не может превышать 200 знаков, дата релиза не должна быть раньше 28.12.1895г.," +
