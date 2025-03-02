@@ -82,7 +82,7 @@ public class FilmController {
         } else if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(startDate)) {
             log.error("Дата релиза не должна быть раньше 28.12.1895г.");
             throw new ValidationException();
-        } else if (film.getDuration() != null && film.getDuration().toMinutes() < 0) {
+        } else if (film.getDuration() != null && film.getDuration() < 0) {
             log.error("Продолжительность фильма должна быть положительным числом.");
             throw new ValidationException();
         } else if (film.getName().isBlank()) {
