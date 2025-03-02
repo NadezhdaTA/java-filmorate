@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -146,8 +145,7 @@ class FilmorateApplicationTests {
 		assertEquals(1, filmController.getFilmsList().size());
 
 		Film film1 = new Film("Film1Test");
-		Duration duration = Duration.ofMinutes(90);
-		film1.setDuration(duration);
+		film1.setDuration(90);
 		LocalDate date = LocalDate.of(1997, 2,12);
 		film1.setReleaseDate(date);
 		film1.setDescription("Description1");
@@ -193,8 +191,7 @@ class FilmorateApplicationTests {
 		assertEquals(1, filmController.getFilmsList().size());
 
 		Film film1 = new Film("filmTest1");
-		Duration duration = Duration.ofMinutes(-15);
-		film1.setDuration(duration);
+		film1.setDuration(-15);
 		assertThrows(ValidationException.class, () -> filmController.createFilm(film1));
 
 		assertEquals(1, filmController.getFilmsList().size());
@@ -207,8 +204,7 @@ class FilmorateApplicationTests {
 		assertEquals(1, filmController.getFilmsList().size());
 
 		Film film1 = new Film("filmTest1");
-		Duration duration = Duration.ofMinutes(120);
-		film1.setDuration(duration);
+		film1.setDuration(120);
 		film1.setDescription("TestDescription");
 		film1.setId(film.getId());
 
