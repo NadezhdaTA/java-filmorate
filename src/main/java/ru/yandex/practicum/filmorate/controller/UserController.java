@@ -21,59 +21,52 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) throws ValidationException {
+        try {
+            validateUser(user);
+        } catch (ValidationException e) {
+            log.error(e.getMessage());
+            throw new ValidationException(e.getMessage());
+        }
 
-            if (!user.getEmail().contains("@")) {
-                log.error("Email должен содержать знак @.");
-               throw new ValidationException();
-            } else if (user.getLogin().contains(" ")) {
-                log.error("Логин не должен иметь пробелы.");
-                throw new ValidationException();
-            } else if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-                log.error("Дата рождения не может быть в будущем.");
-                throw new ValidationException();
-            }
+        user.setId(nextUserId);
+        nextUserId++;
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
 
-            user.setId(nextUserId);
-            nextUserId++;
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-
-            users.put(user.getId(), user);
-            log.debug("Пользователь успешно добавлен - {} \n", user);
-            return user;
-
+        users.put(user.getId(), user);
+        log.debug("Пользователь успешно добавлен - {} \n", user);
+        return user;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User newUser) throws ValidationException, DuplicatedDataException, NotFoundException {
+    public User updateUser(@RequestBody User newUser) throws DuplicatedDataException, NotFoundException, ValidationException {
+        if (users.containsKey(newUser.getId())) {
+            User oldUser = users.get(newUser.getId());
 
-            if (users.containsKey(newUser.getId())) {
-                User oldUser = users.get(newUser.getId());
-
-                if (!newUser.getEmail().contains("@") || newUser.getLogin().contains(" ") || newUser.getBirthday().isAfter(LocalDate.now())) {
-                    log.error("Email должен содержать знак @, логин не должен иметь пробелы, дата рождения не может быть в будущем.");
-                    throw new ValidationException();
-                }
-
-                for (User user1 : users.values()) {
-                    if (newUser.getEmail().equals(user1.getEmail())) {
-                        log.error("Этот email уже используется.");
-                        throw new DuplicatedDataException();
-                    }
-                }
-
-                oldUser.setEmail(newUser.getEmail());
-                oldUser.setLogin(newUser.getLogin());
-                oldUser.setName(newUser.getName());
-                oldUser.setBirthday(newUser.getBirthday());
-                log.debug("Пользователь успешно обновлен - {} \n", oldUser);
-                return oldUser;
+            try {
+                validateUser(newUser);
+            } catch (ValidationException e) {
+                throw new ValidationException(e.getMessage());
             }
 
-            log.error("Пост с id {} не найден", newUser.getId());
-            throw new NotFoundException();
+            for (User user1 : users.values()) {
+                if (newUser.getEmail().equals(user1.getEmail())) {
+                    log.error("Этот email уже используется.");
+                    throw new DuplicatedDataException();
+                }
+            }
 
+            oldUser.setEmail(newUser.getEmail());
+            oldUser.setLogin(newUser.getLogin());
+            oldUser.setName(newUser.getName());
+            oldUser.setBirthday(newUser.getBirthday());
+            log.debug("Пользователь успешно обновлен - {} \n", oldUser);
+            return oldUser;
+        }
+
+        log.error("Пост с id {} не найден", newUser.getId());
+        throw new NotFoundException();
     }
 
     @GetMapping
@@ -83,6 +76,19 @@ public class UserController {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);
+        }
+    }
+
+    private void validateUser(User user) throws ValidationException {
+        if (!user.getEmail().contains("@")) {
+            log.error("Email должен содержать знак @.");
+            throw new ValidationException();
+        } else if (user.getLogin().contains(" ")) {
+            log.error("Логин не должен иметь пробелы.");
+            throw new ValidationException();
+        } else if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
+            log.error("Дата рождения не может быть в будущем.");
+            throw new ValidationException();
         }
     }
 }
