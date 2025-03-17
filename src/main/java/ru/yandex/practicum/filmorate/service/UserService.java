@@ -65,7 +65,7 @@ public class UserService {
         userStorage.addFriend(friendId, friendFriends);
     }
 
-    public Collection<String> getFriendsList (int id) {
+    public Collection<String> getFriendsList(int id) {
         return userStorage.getFriendsList(id).stream()
                 .map(User::getName)
                 .collect(Collectors.toList());
