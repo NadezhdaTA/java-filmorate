@@ -8,14 +8,14 @@ import java.util.*;
 
 @Slf4j
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private int nextUserId = 1;
 
     private final Map<Integer, User> users = new HashMap<>();
     private Map<Integer, Set<User>> userFriends = new HashMap<>();
 
     @Override
-    public User createUser(User user){
+    public User createUser(User user) {
         user.setId(nextUserId++);
         users.put(user.getId(), user);
         return user;
