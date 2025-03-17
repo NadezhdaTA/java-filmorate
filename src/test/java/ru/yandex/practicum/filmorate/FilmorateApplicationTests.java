@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class FilmorateApplicationTests {
-    private final FilmService filmService= new FilmService();
+    private final FilmService filmService = new FilmService();
 	private final UserController userController = new UserController();
 	private final FilmController filmController = new FilmController(filmService);
 
