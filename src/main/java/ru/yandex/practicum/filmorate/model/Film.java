@@ -32,7 +32,6 @@ public class Film {
     Integer duration;
 
     private Integer id;
-    private Integer likes;
 
     public Film() {
 

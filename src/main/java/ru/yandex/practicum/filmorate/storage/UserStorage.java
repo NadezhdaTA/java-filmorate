@@ -1,27 +1,25 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public interface UserStorage {
     Map<Integer, User> users = Map.of();
 
-    User createUser(User user) throws ValidationException;
+    User createUser(User user);
 
-    User updateUser(User newUser) throws DuplicatedDataException, NotFoundException, ValidationException;
+    User updateUser(User newUser);
 
     Collection<User> getUsersList();
 
     Optional<User> getUserById(int id);
 
-    void addFriend(int id, Set<User> friends);
+    void addFriend(User user, User friend);
 
-    Set<User> getFriendsList(int id);
+    Collection<User> getFriendsList(int id);
+
+    void deleteFriend(User user, User friend);
 }

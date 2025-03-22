@@ -4,21 +4,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Validated
 public class UserService {
-    private UserStorage userStorage = new InMemoryUserStorage();
+    private final UserStorage userStorage = new InMemoryUserStorage();
 
-    public User createUser(User user) throws ValidationException {
+    public User createUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -30,21 +28,15 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Пользователь с Id = " + id + " не найден."));
     }
 
-    public User updateUser(User newUser) throws DuplicatedDataException, NotFoundException, ValidationException {
-        User oldUser = getUserById(newUser.getId());
+    public User updateUser(User newUser) throws DuplicatedDataException, NotFoundException {
+        getUserById(newUser.getId());
 
         userStorage.getUsersList().stream()
                 .filter(user -> !user.getEmail().equals(newUser.getEmail()))
                 .findAny()
                 .orElseThrow(() -> new DuplicatedDataException("Еmail: " + newUser.getEmail() + " уже используется."));
 
-
-        oldUser.setEmail(newUser.getEmail());
-        oldUser.setLogin(newUser.getLogin());
-        oldUser.setName(newUser.getName());
-        oldUser.setBirthday(newUser.getBirthday());
-
-        return userStorage.updateUser(oldUser);
+        return userStorage.updateUser(newUser);
     }
 
     public Collection<User> getUsersList() {
@@ -55,14 +47,7 @@ public class UserService {
     public void addFriend(int userId, int friendId) throws NotFoundException {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
-
-        Set<User> userFriends = userStorage.getFriendsList(userId);
-        userFriends.add(friend);
-        userStorage.addFriend(userId, userFriends);
-
-        Set<User> friendFriends = userStorage.getFriendsList(friendId);
-        friendFriends.add(user);
-        userStorage.addFriend(friendId, friendFriends);
+        userStorage.addFriend(user, friend);
     }
 
     public Collection<String> getFriendsList(int id) {
@@ -72,7 +57,7 @@ public class UserService {
     }
 
     public Collection<String> getCommonFriends(int userId, int friendId) {
-        Set<User> friendsList = userStorage.getFriendsList(friendId);
+        Collection<User> friendsList = userStorage.getFriendsList(friendId);
         return userStorage.getFriendsList(userId).stream()
                 .filter(friendsList::contains)
                 .map(User::getName)
@@ -83,13 +68,7 @@ public class UserService {
         User user = getUserById(id);
         User friend = getUserById(friendId);
 
-        Set<User> userFriends = userStorage.getFriendsList(id);
-        userFriends.remove(friend);
-        userStorage.addFriend(id, userFriends);
-
-        Set<User> friendFriends = userStorage.getFriendsList(friendId);
-        friendFriends.remove(user);
-        userStorage.addFriend(friendId, friendFriends);
+        userStorage.deleteFriend(user, friend);
     }
 
 }

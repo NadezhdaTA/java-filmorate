@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -14,18 +15,20 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
+@Validated
 public class UserController {
-    private UserService userService = new UserService();
+    private final UserService userService;
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) throws ValidationException {
+    public User createUser(@Valid @RequestBody User user) {
         User created = userService.createUser(user);
         log.debug("Пользователь успешно добавлен - {} \n.", created);
         return created;
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User newUser) throws DuplicatedDataException, NotFoundException, ValidationException {
+    public User updateUser(@Valid @RequestBody User newUser) throws DuplicatedDataException, NotFoundException {
         User updated = userService.updateUser(newUser);
         log.debug("Пользователь успешно обновлен - {} \n.", updated);
         return updated;
@@ -65,5 +68,4 @@ public class UserController {
         userService.deleteFriend(id, friendId);
         log.debug("Друг успешно удален.");
     }
-
 }

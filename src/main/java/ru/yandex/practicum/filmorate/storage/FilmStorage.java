@@ -1,11 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -13,16 +9,18 @@ import java.util.Set;
 public interface FilmStorage {
     Map<Integer, Film> films = Map.of();
 
-    Film createFilm(Film film) throws ValidationException;
+    Film createFilm(Film film);
 
-    Film updateFilm(Film newFilm) throws DuplicatedDataException, NotFoundException, ValidationException;
+    Film updateFilm(Film newFilm);
 
-    Collection<Film> getFilmsList();
+    Map<Integer, Film> getFilms();
 
     Optional<Film> getFilmById(int id);
 
-    void addLikes(int filmId, Set<Integer> userIds);
+    void addLikes(int filmId, int userId);
 
-    Set<Integer> getLikesCount(int filmId);
+    void deleteLikes(int filmId, int userId);
+
+    Map<Integer, Set<Integer>> getPopularFilms(int count);
 
 }

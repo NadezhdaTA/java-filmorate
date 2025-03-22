@@ -23,13 +23,20 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film newFilm) {
-        films.put(newFilm.getId(), newFilm);
-        return newFilm;
+        Film oldFilm = films.get(newFilm.getId());
+
+        oldFilm.setName(newFilm.getName());
+        oldFilm.setDescription(newFilm.getDescription());
+        oldFilm.setReleaseDate(newFilm.getReleaseDate());
+        oldFilm.setDuration(newFilm.getDuration());
+
+        films.put(oldFilm.getId(), newFilm);
+        return oldFilm;
     }
 
     @Override
-    public Collection<Film> getFilmsList() {
-        return films.values();
+    public Map<Integer, Film> getFilms() {
+        return films;
     }
 
     @Override
@@ -38,12 +45,20 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLikes(int filmId, Set<Integer> userIds) {
-        filmLikes.put(filmId, userIds);
-
+    public void addLikes(int filmId, int userId) {
+        filmLikes.computeIfAbsent(filmId, f -> new HashSet<>()).add(userId);
     }
 
-    public Set<Integer> getLikesCount(int filmId) {
-        return filmLikes.get(filmId);
+    @Override
+    public void deleteLikes(int filmId, int userId) {
+        filmLikes.get(filmId).remove(userId);
+        if (filmLikes.get(filmId).isEmpty()) {
+            filmLikes.remove(filmId);
+        }
+    }
+
+    public Map<Integer, Set<Integer>> getPopularFilms(int count) {
+        return filmLikes;
+
     }
 }

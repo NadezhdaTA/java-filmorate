@@ -6,30 +6,28 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class FilmorateApplicationTests {
-    private final FilmService filmService = new FilmService();
-	private final UserController userController = new UserController();
-	private final FilmController filmController = new FilmController(filmService);
+	private final UserService userService = new UserService();
+	private final FilmService filmService = new FilmService();
+	private final UserController userController = new UserController(userService);
+	private final FilmController filmController = new FilmController(filmService, userController);
 
 	private User user = new User("user@test", "testLogin");
 	private Film film = new Film("testFilm");
 
 	@Test
-	void contextLoads() {
-	}
-
-	@Test
-	void getUsersListTest() throws ValidationException {
+	void getUsersListTest() {
 		assertEquals(0, userController.getUsersList().size());
 
 		userController.createUser(user);
@@ -43,7 +41,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void createUserTest() throws ValidationException {
+	void createUserTest() {
 		assertEquals(0, userController.getUsersList().size());
 
 		userController.createUser(user);
@@ -59,7 +57,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void userEmailTest() throws ValidationException {
+	void userEmailTest() {
 		assertEquals(0, userController.getUsersList().size());
 
 		userController.createUser(user);
@@ -72,7 +70,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void userLoginTest() throws ValidationException {
+	void userLoginTest() {
 		assertEquals(0, userController.getUsersList().size());
 
 		userController.createUser(user);
@@ -85,7 +83,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void userBirthdayTest() throws ValidationException {
+	void userBirthdayTest() {
 		assertEquals(0, userController.getUsersList().size());
 
 		LocalDate date = LocalDate.of(1985,3, 12);
@@ -102,7 +100,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void updateUserTest() throws ValidationException, NotFoundException, DuplicatedDataException {
+	void updateUserTest() throws NotFoundException, DuplicatedDataException {
 		userController.createUser(user);
 
 		assertEquals(1, userController.getUsersList().size());
@@ -121,7 +119,18 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void getFilmsListTest() throws ValidationException {
+	void getUserById() throws NotFoundException {
+		userController.createUser(user);
+		User user1 = new User("user@test1", "testLogin1");
+		userController.createUser(user1);
+
+		assertEquals(2, userController.getUsersList().size());
+
+		assertEquals(user1, userController.getUserById(2));
+	}
+
+	@Test
+	void getFilmsListTest() {
 		assertEquals(0, filmController.getFilmsList().size());
 
 		filmController.createFilm(film);
@@ -135,7 +144,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void createFilmTest() throws ValidationException {
+	void createFilmTest() {
 		assertEquals(0, filmController.getFilmsList().size());
 
 		filmController.createFilm(film);
@@ -150,11 +159,10 @@ class FilmorateApplicationTests {
 		filmController.createFilm(film1);
 
 		assertEquals(2, filmController.getFilmsList().size());
-
 	}
 
 	@Test
-	void filmDescriptionTest() throws ValidationException {
+	void filmDescriptionTest() {
 		filmController.createFilm(film);
 
 		assertEquals(1, filmController.getFilmsList().size());
@@ -168,7 +176,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void filmReleaseDateTest() throws ValidationException {
+	void filmReleaseDateTest() {
 		filmController.createFilm(film);
 
 		assertEquals(1, filmController.getFilmsList().size());
@@ -181,7 +189,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void filmDurationTst() throws ValidationException {
+	void filmDurationTest() {
 		filmController.createFilm(film);
 
 		assertEquals(1, filmController.getFilmsList().size());
@@ -193,7 +201,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	void updateFilmTest() throws ValidationException, NotFoundException, DuplicatedDataException {
+	void updateFilmTest() throws NotFoundException, DuplicatedDataException {
 		filmController.createFilm(film);
 
 		assertEquals(1, filmController.getFilmsList().size());
@@ -210,6 +218,39 @@ class FilmorateApplicationTests {
 		assertEquals(film.getName(), film1.getName());
 
 		assertEquals(1, filmController.getFilmsList().size());
+
+	}
+
+	@Test
+	void getFriendsListTest() throws NotFoundException {
+		userController.createUser(user);
+		User user1 = userController.createUser(new User("name@l", "login"));
+		User user2 = userController.createUser(new User("name@lm", "logins"));
+
+		userController.addFriend(user.getId(), user1.getId());
+		userController.addFriend(user.getId(), user2.getId());
+		assertEquals(2, userController.getUsersFriends(user.getId()).size());
+
+		userController.deleteFriend(user.getId(), 2);
+
+		assertEquals(1, userController.getUsersFriends(user.getId()).size());
+
+	}
+
+	@Test
+	void addLikesTest() {
+		filmController.createFilm(film);
+		userController.createUser(user);
+
+		filmController.addLikes(film.getId(), user.getId());
+
+		Collection<String> filmNames = filmController.getPopularFilmList(film.getId());
+
+		assertEquals(1, filmController.getPopularFilmList(film.getId()).size());
+
+		filmController.deleteFilmLikes(film.getId(), user.getId());
+
+		assertEquals(0, filmController.getPopularFilmList(film.getId()).size());
 	}
 
 }
