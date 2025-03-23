@@ -21,7 +21,7 @@ class FilmorateApplicationTests {
 	private final UserService userService = new UserService();
 	private final FilmService filmService = new FilmService();
 	private final UserController userController = new UserController(userService);
-	private final FilmController filmController = new FilmController(filmService, userController);
+	private final FilmController filmController = new FilmController(filmService);
 
 	private User user = new User("user@test", "testLogin");
 	private Film film = new Film("testFilm");

@@ -12,7 +12,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private int nextFilmId = 1;
 
     private final Map<Integer, Film> films = new HashMap<>();
-    private Map<Integer, Set<Integer>> filmLikes = new HashMap<>();
+    private final Map<Integer, Set<Integer>> filmLikes = new HashMap<>();
 
     @Override
     public Film createFilm(Film film) {

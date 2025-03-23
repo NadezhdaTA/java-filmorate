@@ -19,7 +19,6 @@ import java.util.Collection;
 @Validated
 public class FilmController {
     private final FilmService filmService;
-    private final UserController userController;
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {

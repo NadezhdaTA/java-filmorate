@@ -12,7 +12,7 @@ public class InMemoryUserStorage implements UserStorage {
     private int nextUserId = 1;
 
     private final Map<Integer, User> users = new HashMap<>();
-    private Map<Integer, Set<User>> userFriends = new HashMap<>();
+    private final Map<Integer, Set<User>> userFriends = new HashMap<>();
 
     @Override
     public User createUser(User user) {
