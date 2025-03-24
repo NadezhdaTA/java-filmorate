@@ -1,94 +1,71 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
+@Validated
 public class UserController {
-    private int nextUserId = 1;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
 
     @PostMapping
-    public User createUser(@RequestBody User user) throws ValidationException {
-        try {
-            validateUser(user);
-        } catch (ValidationException e) {
-            log.error(e.getMessage());
-            throw new ValidationException(e.getMessage());
-        }
-
-        user.setId(nextUserId);
-        nextUserId++;
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-
-        users.put(user.getId(), user);
-        log.debug("Пользователь успешно добавлен - {} \n", user);
-        return user;
+    public User createUser(@Valid @RequestBody User user) {
+        User created = userService.createUser(user);
+        log.debug("Пользователь успешно добавлен - {} \n.", created);
+        return created;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User newUser) throws DuplicatedDataException, NotFoundException, ValidationException {
-        if (users.containsKey(newUser.getId())) {
-            User oldUser = users.get(newUser.getId());
-
-            try {
-                validateUser(newUser);
-            } catch (ValidationException e) {
-                throw new ValidationException(e.getMessage());
-            }
-
-            for (User user1 : users.values()) {
-                if (newUser.getEmail().equals(user1.getEmail())) {
-                    log.error("Этот email уже используется.");
-                    throw new DuplicatedDataException();
-                }
-            }
-
-            oldUser.setEmail(newUser.getEmail());
-            oldUser.setLogin(newUser.getLogin());
-            oldUser.setName(newUser.getName());
-            oldUser.setBirthday(newUser.getBirthday());
-            log.debug("Пользователь успешно обновлен - {} \n", oldUser);
-            return oldUser;
-        }
-
-        log.error("Пост с id {} не найден", newUser.getId());
-        throw new NotFoundException();
+    public User updateUser(@Valid @RequestBody User newUser) throws DuplicatedDataException, NotFoundException {
+        User updated = userService.updateUser(newUser);
+        log.debug("Пользователь успешно обновлен - {} \n.", updated);
+        return updated;
     }
 
     @GetMapping
     public Collection<User> getUsersList() {
-        try {
-            return users.values();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new RuntimeException(e);
-        }
+        return userService.getUsersList();
     }
 
-    private void validateUser(User user) throws ValidationException {
-        if (!user.getEmail().contains("@")) {
-            log.error("Email должен содержать знак @.");
-            throw new ValidationException();
-        } else if (user.getLogin().contains(" ")) {
-            log.error("Логин не должен иметь пробелы.");
-            throw new ValidationException();
-        } else if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения не может быть в будущем.");
-            throw new ValidationException();
-        }
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable int id) throws NotFoundException {
+        return userService.getUserById(id);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Collection<String> getUsersFriends(@PathVariable int id) {
+        return userService.getFriendsList(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{friendId}")
+    public Collection<String> getCommonFriends(@PathVariable int id,
+                                               @PathVariable int friendId) {
+        return userService.getCommonFriends(id, friendId);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable int id,
+                          @PathVariable int friendId) throws NotFoundException {
+        userService.addFriend(id, friendId);
+        log.debug("Друг успешно добавлен.");
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable int id,
+                             @PathVariable int friendId) throws NotFoundException {
+        userService.deleteFriend(id, friendId);
+        log.debug("Друг успешно удален.");
     }
 }

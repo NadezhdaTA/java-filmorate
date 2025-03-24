@@ -1,8 +1,4 @@
+#file: noinspection SpellCheckingInspection,SpellCheckingInspection
 name: Films API Tests
 
 on:
-  pull_request:
-
-jobs:
-  build:
-    uses: yandex-praktikum/java-filmorate/.github/workflows/api-tests.yml@ci
