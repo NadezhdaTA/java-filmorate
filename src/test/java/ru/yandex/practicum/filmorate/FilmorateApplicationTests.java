@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Friends;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -226,14 +228,16 @@ class FilmorateApplicationTests {
 		userController.createUser(user);
 		User user1 = userController.createUser(new User("name@l", "login"));
 		User user2 = userController.createUser(new User("name@lm", "logins"));
+		Friends friends1 = new Friends(user.getId(), user1.getId(), Friendship.NOT_CONFIRMED);
+		Friends friends2 = new Friends(user.getId(), user2.getId(), Friendship.CONFIRMED);
 
-		userController.addFriend(user.getId(), user1.getId());
-		userController.addFriend(user.getId(), user2.getId());
+		userController.addFriend(user.getId(), user1.getId(), friends1.getFriendship());
+		userController.addFriend(user.getId(), user2.getId(), friends2.getFriendship());
 		assertEquals(2, userController.getUsersFriends(user.getId()).size());
 
 		userController.deleteFriend(user.getId(), 2);
 
-		assertEquals(1, userController.getUsersFriends(user.getId()).size());
+		assertEquals(2, userController.getUsersFriends(user.getId()).size());
 
 	}
 

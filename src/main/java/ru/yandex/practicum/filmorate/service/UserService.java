@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Friends;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -44,22 +46,28 @@ public class UserService {
     }
 
 
-    public void addFriend(int userId, int friendId) throws NotFoundException {
+    public void addFriend(int userId, int friendId, Friendship friendStatus) throws NotFoundException {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
-        userStorage.addFriend(user, friend);
+        Friends userFriend = new Friends(userId, friendId, friendStatus);
+        Friends friendFriend = new Friends(friendId, userId, Friendship.CONFIRMED);
+        userStorage.addFriend(user, friend, userFriend, friendFriend);
     }
 
     public Collection<String> getFriendsList(int id) {
         return userStorage.getFriendsList(id).stream()
+                .map(Friends::getFriendId)
+                .map(this::getUserById)
                 .map(User::getName)
                 .collect(Collectors.toList());
     }
 
     public Collection<String> getCommonFriends(int userId, int friendId) {
-        Collection<User> friendsList = userStorage.getFriendsList(friendId);
+        var friendsList = userStorage.getFriendsList(friendId);
         return userStorage.getFriendsList(userId).stream()
                 .filter(friendsList::contains)
+                .map(Friends::getFriendId)
+                .map(this::getUserById)
                 .map(User::getName)
                 .collect(Collectors.toList());
     }

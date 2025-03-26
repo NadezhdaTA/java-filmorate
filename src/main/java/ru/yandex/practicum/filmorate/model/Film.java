@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Slf4j
@@ -32,6 +34,10 @@ public class Film {
     Integer duration;
 
     private Integer id;
+
+    private Set<Genre> genres = new HashSet<>();
+
+    private AgeRating ageRating;
 
     public Film() {
 

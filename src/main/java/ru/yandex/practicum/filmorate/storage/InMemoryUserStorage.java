@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Friends;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -12,7 +13,7 @@ public class InMemoryUserStorage implements UserStorage {
     private int nextUserId = 1;
 
     private final Map<Integer, User> users = new HashMap<>();
-    private final Map<Integer, Set<User>> userFriends = new HashMap<>();
+    private final Map<Integer, Set<Friends>> userFriends = new HashMap<>();
 
     @Override
     public User createUser(User user) {
@@ -45,13 +46,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(User user, User friend) {
-        userFriends.computeIfAbsent(user.getId(), u -> new HashSet<>()).add(friend);
-        userFriends.computeIfAbsent(friend.getId(), f -> new HashSet<>()).add(user);
+    public void addFriend(User user, User friend, Friends userFriend, Friends friendFriend) {
+        userFriends.computeIfAbsent(user.getId(), u -> new HashSet<>()).add(userFriend);
+        userFriends.computeIfAbsent(friend.getId(), f -> new HashSet<>()).add(friendFriend);
+
     }
 
     @Override
-    public Collection<User> getFriendsList(int id) {
+    public Collection<Friends> getFriendsList(int id) {
         return userFriends.get(id);
     }
 
