@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -55,10 +56,11 @@ public class UserController {
         return userService.getCommonFriends(id, friendId);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
+    @PutMapping("/{id}/friends/{friendId}/status/{status}")
     public void addFriend(@PathVariable int id,
-                          @PathVariable int friendId) throws NotFoundException {
-        userService.addFriend(id, friendId);
+                          @PathVariable int friendId,
+                          @PathVariable Friendship status) throws NotFoundException {
+        userService.addFriend(id, friendId, status);
         log.debug("Друг успешно добавлен.");
     }
 
