@@ -1,22 +1,28 @@
 package ru.yandex.practicum.filmorate.service;
 
+
+import org.springframework.beans.factory.annotation.Qualifier;
+
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Friends;
-import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
+
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
 @Validated
+@Qualifier
 public class UserService {
-    private final UserStorage userStorage = new InMemoryUserStorage();
+    private final UserDbStorage userStorage;
+
+    public UserService(UserDbStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     public User createUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
@@ -46,29 +52,26 @@ public class UserService {
     }
 
 
-    public void addFriend(int userId, int friendId, Friendship friendStatus) throws NotFoundException {
+    public void addFriend(int userId, int friendId) throws NotFoundException {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
-        Friends userFriend = new Friends(userId, friendId, friendStatus);
-        Friends friendFriend = new Friends(friendId, userId, Friendship.CONFIRMED);
-        userStorage.addFriend(user, friend, userFriend, friendFriend);
+        userStorage.addFriend(user, friend);
     }
 
-    public Collection<String> getFriendsList(int id) {
-        return userStorage.getFriendsList(id).stream()
-                .map(Friends::getFriendId)
+    public Collection<User> getFriendsList(int id) {
+        getUserById(id);
+
+        return userStorage.getFriendsList(id)
+                .stream()
                 .map(this::getUserById)
-                .map(User::getName)
-                .collect(Collectors.toList());
+               .collect(Collectors.toList());
     }
 
-    public Collection<String> getCommonFriends(int userId, int friendId) {
+    public Collection<User> getCommonFriends(int userId, int friendId) {
         var friendsList = userStorage.getFriendsList(friendId);
         return userStorage.getFriendsList(userId).stream()
                 .filter(friendsList::contains)
-                .map(Friends::getFriendId)
                 .map(this::getUserById)
-                .map(User::getName)
                 .collect(Collectors.toList());
     }
 

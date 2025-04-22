@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Friendship;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -16,20 +15,21 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/users")
 @Slf4j
-@RequiredArgsConstructor
 @Validated
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
+    public User createUser(@Validated @RequestBody User user) throws ValidationException, DuplicatedDataException {
         User created = userService.createUser(user);
         log.debug("Пользователь успешно добавлен - {} \n.", created);
         return created;
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User newUser) throws DuplicatedDataException, NotFoundException {
+    public User updateUser(@Validated @RequestBody User newUser)
+            throws DuplicatedDataException, NotFoundException, ValidationException {
         User updated = userService.updateUser(newUser);
         log.debug("Пользователь успешно обновлен - {} \n.", updated);
         return updated;
@@ -46,21 +46,20 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public Collection<String> getUsersFriends(@PathVariable int id) {
+    public Collection<User> getUsersFriends(@PathVariable int id) {
         return userService.getFriendsList(id);
     }
 
     @GetMapping("/{id}/friends/common/{friendId}")
-    public Collection<String> getCommonFriends(@PathVariable int id,
+    public Collection<User> getCommonFriends(@PathVariable int id,
                                                @PathVariable int friendId) {
         return userService.getCommonFriends(id, friendId);
     }
 
-    @PutMapping("/{id}/friends/{friendId}/status/{status}")
+    @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable int id,
-                          @PathVariable int friendId,
-                          @PathVariable Friendship status) throws NotFoundException {
-        userService.addFriend(id, friendId, status);
+                          @PathVariable int friendId) throws NotFoundException {
+        userService.addFriend(id, friendId);
         log.debug("Друг успешно добавлен.");
     }
 

@@ -1,8 +1,8 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.interfaces;
 
-import ru.yandex.practicum.filmorate.model.Friends;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -16,11 +16,11 @@ public interface UserStorage {
 
     Collection<User> getUsersList();
 
-    Optional<User> getUserById(int id);
+    Optional<User> getUserById(int id) throws SQLException;
 
-    void addFriend(User user, User friend, Friends userFriend, Friends friendFriend);
+    void addFriend(User user, User friend);
 
-    Collection<Friends> getFriendsList(int id);
+    Collection<Integer> getFriendsList(int id);
 
     void deleteFriend(User user, User friend);
 }

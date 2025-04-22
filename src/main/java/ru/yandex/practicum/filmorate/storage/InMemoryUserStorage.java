@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Friends;
+import ru.yandex.practicum.filmorate.model.FriendsStatus;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.*;
 
@@ -46,15 +48,16 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(User user, User friend, Friends userFriend, Friends friendFriend) {
-        userFriends.computeIfAbsent(user.getId(), u -> new HashSet<>()).add(userFriend);
-        userFriends.computeIfAbsent(friend.getId(), f -> new HashSet<>()).add(friendFriend);
-
+    public void addFriend(User user, User friend) {
+        userFriends.computeIfAbsent(user.getId(), u ->
+                new HashSet<>()).add(new Friends(user.getId(), friend.getId(), FriendsStatus.CONFIRMED));
     }
 
     @Override
-    public Collection<Friends> getFriendsList(int id) {
-        return userFriends.get(id);
+    public Collection<Integer> getFriendsList(int id) {
+        return userFriends.get(id).stream()
+                .map(Friends::getFriendId)
+                .toList();
     }
 
     @Override

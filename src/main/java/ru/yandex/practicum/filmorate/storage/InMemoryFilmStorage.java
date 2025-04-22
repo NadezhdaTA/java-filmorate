@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
 import java.util.*;
 
@@ -29,16 +30,16 @@ public class InMemoryFilmStorage implements FilmStorage {
         oldFilm.setDescription(newFilm.getDescription());
         oldFilm.setReleaseDate(newFilm.getReleaseDate());
         oldFilm.setDuration(newFilm.getDuration());
-        oldFilm.setAgeRating((newFilm.getAgeRating()));
-        oldFilm.setGenres(newFilm.getGenres());
+        oldFilm.setMpaRating((newFilm.getMpaRating()));
+        oldFilm.setGenre(newFilm.getGenre());
 
         films.put(oldFilm.getId(), newFilm);
         return oldFilm;
     }
 
     @Override
-    public Map<Integer, Film> getFilms() {
-        return films;
+    public Collection<Film> getFilms() {
+        return films.values();
     }
 
     @Override
@@ -59,8 +60,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
-    public Map<Integer, Set<Integer>> getPopularFilms(int count) {
-        return filmLikes;
+    public Collection<Film> getPopularFilms(int count) {
+        return null;
 
     }
 }

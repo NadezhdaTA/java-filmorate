@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-public enum Friendship {
+public enum FriendsStatus {
     CONFIRMED,
-    NOT_CONFIRMED,
-    DENIED
+    UNCONFIRMED
 }
