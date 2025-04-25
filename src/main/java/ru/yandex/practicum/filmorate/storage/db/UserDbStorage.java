@@ -6,23 +6,20 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
-@Qualifier
+@Qualifier("UserDbStorage")
 public class UserDbStorage extends UserRowMapper implements UserStorage {
     private final JdbcTemplate jdbc;
-    @Qualifier("userRowMapper")
-    private final UserRowMapper mapper;
+    private final UserRowMapper mapper = new UserRowMapper();
 
 
     @Override
@@ -60,12 +57,14 @@ public class UserDbStorage extends UserRowMapper implements UserStorage {
 
     @Override
     public Optional<User> getUserById(int user_id) throws DataAccessException{
-        int id = jdbc.queryForObject("SELECT COUNT(login) FROM users WHERE user_id = ?", Integer.class, user_id);
+        int id = jdbc.queryForObject("SELECT COUNT(login) FROM users WHERE user_id = ?",
+                Integer.class, user_id);
+
         if (id == 0) {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(jdbc.queryForObject("SELECT * FROM USERS WHERE USER_ID = ?",
+        return Optional.of(jdbc.queryForObject("SELECT * FROM USERS WHERE USER_ID = ?",
                     new UserRowMapper(), user_id));
     }
 
@@ -78,7 +77,8 @@ public class UserDbStorage extends UserRowMapper implements UserStorage {
 
     @Override
     public Collection<Integer> getFriendsList(int id) {
-            return jdbc.queryForList("SELECT friend_id FROM friends WHERE user_id = ?", Integer.class, id);
+            return jdbc.queryForList("SELECT friend_id FROM friends WHERE user_id = ?",
+                    Integer.class, id);
     }
 
     @Override

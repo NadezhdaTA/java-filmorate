@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @Slf4j
-@EqualsAndHashCode(of = {"id, email"})
+@EqualsAndHashCode(of = {"id"})
 public class User {
     private Integer id;
     private String name;

@@ -18,12 +18,11 @@ import java.util.stream.Collectors;
 
 
 @Repository
-@Qualifier
+@Qualifier("FilmDbStorage")
 @RequiredArgsConstructor
 public class FilmDbStorage extends FilmRowMapper implements FilmStorage {
     private final JdbcTemplate jdbc;
-    @Qualifier("filmRowMapper")
-    private final FilmRowMapper mapper;
+    private final FilmRowMapper mapper = new FilmRowMapper();
 
     private void getMpaRating(Film film) {
         int mpaId = jdbc.queryForObject("SELECT IFNULL(mpa_id, 0) FROM films WHERE film_id = ?",
@@ -136,12 +135,14 @@ public class FilmDbStorage extends FilmRowMapper implements FilmStorage {
     @Override
     public Collection<Film> getPopularFilms(int count) {
         List<Integer> filmIds = jdbc.queryForList(
-                "SELECT film_id FROM likes GROUP BY film_id ORDER BY COUNT(user_id) DESC LIMIT ?", Integer.class, count);
+                "SELECT film_id FROM likes GROUP BY film_id ORDER BY COUNT(user_id) DESC LIMIT ?",
+                Integer.class, count);
 
         Collection<Film> films = new ArrayList<>();
         if (!filmIds.isEmpty()) {
             for (Integer filmId : filmIds) {
-                Film film = jdbc.queryForObject("SELECT * FROM films WHERE film_id = ?", new FilmRowMapper(), filmId);
+                Film film = jdbc.queryForObject("SELECT * FROM films WHERE film_id = ?",
+                        new FilmRowMapper(), filmId);
                 getMpaRating(film);
                 getGenre(film);
                 films.add(film);

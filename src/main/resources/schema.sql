@@ -33,11 +33,6 @@ CREATE TABLE IF NOT EXISTS users (
     birthday DATE
 );
 
-CREATE TABLE IF NOT EXISTS friends_status (
-    status_id INTEGER PRIMARY KEY,
-    status VARCHAR
-);
-
 CREATE TABLE IF NOT EXISTS friends (
     user_id INTEGER,
     friend_id INTEGER,
