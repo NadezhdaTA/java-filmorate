@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,14 +24,14 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@Validated @RequestBody Film film) {
+    public Film createFilm(@Valid @RequestBody Film film) {
         Film created = filmService.createFilm(film);
         log.debug("Фильм успешно добавлен - {} \n", created);
         return created;
     }
 
     @PutMapping
-    public Film updateFilm(@Validated @RequestBody Film newFilm)
+    public Film updateFilm(@Valid @RequestBody Film newFilm)
             throws DuplicatedDataException, NotFoundException, ValidationException {
         Film updated = filmService.updateFilm(newFilm);
         log.debug("Фильм успешно обновлен - {} \n", updated);

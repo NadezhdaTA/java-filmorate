@@ -57,11 +57,7 @@ class UserDbStorageTest extends TestData {
         ArrayList<User> friends = new ArrayList<>();
         friends.add(getUser2());
 
-        ArrayList<Integer> friendsIds = new ArrayList<>(userStorage.getFriendsList(getUser1().getId()));
-        ArrayList<User> friends1 = friendsIds.stream()
-                .map(userStorage::getUserById)
-                .map(Optional::get)
-                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<User> friends1 = new ArrayList<>(userStorage.getFriendsList(getUser1().getId()));
 
         assertThat(friends).isEqualTo(friends1);
     }

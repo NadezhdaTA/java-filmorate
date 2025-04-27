@@ -20,7 +20,3 @@ merge into genre (genre_id, genre_name)
     values((5), ('Документальный'));
 merge into genre (genre_id, genre_name)
     values((6), ('Боевик'));
-merge into friends_status (status_id, status)
-    values((1), ('CONFIRMED'));
-merge into friends_status (status_id, status)
-    values((2), ('UNCONFIRMED'));

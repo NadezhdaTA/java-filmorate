@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.stereotype.Service;
@@ -9,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
-
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -51,7 +49,6 @@ public class UserService {
         return userStorage.getUsersList();
     }
 
-
     public void addFriend(int userId, int friendId) throws NotFoundException {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
@@ -61,17 +58,13 @@ public class UserService {
     public Collection<User> getFriendsList(int id) {
         getUserById(id);
 
-        return userStorage.getFriendsList(id)
-                .stream()
-                .map(this::getUserById)
-               .collect(Collectors.toList());
+        return userStorage.getFriendsList(id);
     }
 
     public Collection<User> getCommonFriends(int userId, int friendId) {
         var friendsList = userStorage.getFriendsList(friendId);
         return userStorage.getFriendsList(userId).stream()
                 .filter(friendsList::contains)
-                .map(this::getUserById)
                 .collect(Collectors.toList());
     }
 

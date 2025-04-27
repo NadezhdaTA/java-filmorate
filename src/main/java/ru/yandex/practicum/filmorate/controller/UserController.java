@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -21,14 +22,14 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User createUser(@Validated @RequestBody User user) throws ValidationException, DuplicatedDataException {
+    public User createUser(@Valid @RequestBody User user) throws ValidationException, DuplicatedDataException {
         User created = userService.createUser(user);
         log.debug("Пользователь успешно добавлен - {} \n.", created);
         return created;
     }
 
     @PutMapping
-    public User updateUser(@Validated @RequestBody User newUser)
+    public User updateUser(@Valid @RequestBody User newUser)
             throws DuplicatedDataException, NotFoundException, ValidationException {
         User updated = userService.updateUser(newUser);
         log.debug("Пользователь успешно обновлен - {} \n.", updated);

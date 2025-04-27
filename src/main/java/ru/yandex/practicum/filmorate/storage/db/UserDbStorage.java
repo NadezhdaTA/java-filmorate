@@ -46,8 +46,7 @@ public class UserDbStorage extends UserRowMapper implements UserStorage {
                 newUser.getEmail(), newUser.getLogin(), newUser.getName(),
                 newUser.getBirthday().toString(), newUser.getId());
 
-        User user = getUserById(newUser.getId()).get();
-        return user;
+        return newUser;
     }
 
     @Override
@@ -70,15 +69,15 @@ public class UserDbStorage extends UserRowMapper implements UserStorage {
 
     @Override
     public void addFriend(User user, User friend) {
-        jdbc.update("INSERT INTO friends VALUES (?, ?)",
+        jdbc.update("INSERT INTO friends (user_id, friend_id) VALUES (?, ?)",
                 user.getId(), friend.getId());
     }
 
-
     @Override
-    public Collection<Integer> getFriendsList(int id) {
-            return jdbc.queryForList("SELECT friend_id FROM friends WHERE user_id = ?",
-                    Integer.class, id);
+    public Collection<User> getFriendsList(int id) {
+        return jdbc.query("SELECT u.user_id, user_name, email, login, birthday " +
+                "FROM users u JOIN friends f on u.user_id = f.friend_id WHERE f.user_id = ?",
+                new UserRowMapper(), id);
     }
 
     @Override
@@ -86,6 +85,4 @@ public class UserDbStorage extends UserRowMapper implements UserStorage {
         jdbc.update("DELETE FROM friends WHERE user_id = ? AND friend_id = ?",
                 user.getId(), friend.getId());
     }
-
-
 }
