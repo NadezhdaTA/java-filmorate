@@ -10,9 +10,11 @@ public class FilmStartDateValidator implements ConstraintValidator<FilmStartDate
 
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
-        if (value != null) {
-            return value.isAfter(localDate);
-        }
-        return true;
+        return value != null && value.isAfter(localDate);
+    }
+
+    @Override
+    public void initialize(FilmStartDate constraintAnnotation) {
+        LocalDate startDate = LocalDate.parse(constraintAnnotation.value());
     }
 }

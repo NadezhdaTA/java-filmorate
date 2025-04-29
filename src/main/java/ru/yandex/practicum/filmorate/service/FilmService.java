@@ -1,24 +1,23 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.db.FilmDbStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.util.Map.Entry.comparingByValue;
 
 @Service
-@RequiredArgsConstructor
 @Validated
 public class FilmService {
-    private final FilmStorage filmStorage = new InMemoryFilmStorage();
+    private final FilmDbStorage filmStorage;
+
+    public FilmService (FilmDbStorage filmStorage) {
+
+        this.filmStorage = filmStorage;
+    }
 
     public Film createFilm(Film film) {
         return filmStorage.createFilm(film);
@@ -31,17 +30,11 @@ public class FilmService {
 
     public Film updateFilm(Film newFilm) throws DuplicatedDataException, NotFoundException {
         getFilmById(newFilm.getId());
-
-        filmStorage.getFilms().values().stream()
-                .filter(film -> !film.getName().equals(newFilm.getName()))
-                .findFirst()
-                .orElseThrow(() -> new DuplicatedDataException("Фильм с названием \"" + newFilm.getName() + "\" уже существует."));
-
         return filmStorage.updateFilm(newFilm);
     }
 
     public Collection<Film> getFilmsList() {
-        return filmStorage.getFilms().values();
+        return filmStorage.getFilms();
     }
 
     public void addLikes(int filmId, int userId) {
@@ -52,18 +45,8 @@ public class FilmService {
         filmStorage.deleteLikes(filmId, userId);
     }
 
-    public Collection<String> getPopularFilms(int count) {
-        Comparator<Set<Integer>> compareSet = Comparator.comparingInt(Set::size);
-
-        Map<Integer, Set<Integer>> collected = filmStorage.getPopularFilms(count).entrySet().stream().sorted(comparingByValue(compareSet))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entry1, entry2) -> entry2, LinkedHashMap::new));
-
-        HashMap<Integer, Film> films = (HashMap<Integer, Film>) filmStorage.getFilms();
-
-        return collected.keySet().stream()
-                .map(films::get)
-                .map(Film::getName)
-                .limit(count)
-                .collect(Collectors.toList());
+    public Collection<Film> getPopularFilms(int count) {
+        return filmStorage.getPopularFilms(count);
     }
+
 }

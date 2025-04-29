@@ -2,7 +2,7 @@
 Template repository for Filmorate project.
 
 ## BD-structure
-![](/BD-Diagram.png)
+![](/DB-Diagram.png)
 
 Получение списка фильмов по рейтингу:
 ```

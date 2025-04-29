@@ -2,10 +2,12 @@ package ru.yandex.practicum.filmorate.model;
 
 import javax.validation.constraints.Past;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
 
@@ -15,7 +17,9 @@ import java.util.Set;
 
 @Data
 @Slf4j
+@EqualsAndHashCode(of = {"id"})
 public class Film {
+    private Integer id;
 
     @NotBlank(message = "Название не должно быть пустым или иметь пробелы.")
     private String name;
@@ -33,11 +37,11 @@ public class Film {
     @Positive(message = "Продолжительность фильма не может быть меньше 0.")
     Integer duration;
 
-    private Integer id;
+    @JsonProperty("genres")
+    private Set<Genre> genre = new HashSet<>();
 
-    private Set<Genre> genres = new HashSet<>();
-
-    private AgeRating ageRating;
+    @JsonProperty("mpa")
+    private MpaRating mpaRating;
 
     public Film() {
 
