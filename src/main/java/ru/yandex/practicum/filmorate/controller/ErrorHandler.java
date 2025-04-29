@@ -2,19 +2,15 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
 
-    @ResponseBody
     @ExceptionHandler(DuplicatedDataException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDuplicatedDataException(final DuplicatedDataException e) {
@@ -22,7 +18,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ResponseBody
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
@@ -30,7 +25,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ResponseBody
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
@@ -38,7 +32,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ResponseBody
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(final RuntimeException e) {

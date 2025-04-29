@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
