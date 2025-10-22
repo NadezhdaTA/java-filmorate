@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
@@ -19,8 +20,6 @@ import java.util.Optional;
 @Qualifier("UserDbStorage")
 public class UserDbStorage extends UserRowMapper implements UserStorage {
     private final JdbcTemplate jdbc;
-    private final UserRowMapper mapper = new UserRowMapper();
-
 
     @Override
     public User createUser(User user) {
@@ -84,5 +83,15 @@ public class UserDbStorage extends UserRowMapper implements UserStorage {
     public void deleteFriend(User user, User friend) {
         jdbc.update("DELETE FROM friends WHERE user_id = ? AND friend_id = ?",
                 user.getId(), friend.getId());
+    }
+
+    public void deleteUser(int user_id) {
+        int count = jdbc.queryForObject("SELECT COUNT(login) FROM users WHERE user_id = ?",
+                Integer.class, user_id);
+        if (count != 0) {
+            jdbc.update("DELETE FROM users WHERE user_id = ?", user_id);
+        } else {
+            throw new NotFoundException("Пользователь не найден.");
+        }
     }
 }

@@ -24,26 +24,40 @@ class UserDbStorageTest extends TestData {
     private final UserDbStorage userStorage;
 
     @Test
-    public void testGetUserById() {
+    public void getUserByIdTest() {
+        User user = getUser1();
+        user = userStorage.createUser(user);
 
-        Optional<User> userOptional = userStorage.getUserById(1);
+        Optional<User> userOptional = userStorage.getUserById(user.getId());
 
         assertThat(userOptional)
                 .isPresent()
                 .get()
                 .usingRecursiveComparison()
-                .isEqualTo(getUser1());
+                .isEqualTo(user);
     }
 
     @Test
-    public void testGetUsersList() {
+    public void getUsersListTest() {
         Collection<User> users = userStorage.getUsersList();
+        assertThat(users.size()).isEqualTo(0);
+
+        User user = getUser1();
+        userStorage.createUser(user);
+
+        User user1 = getUser2();
+        userStorage.createUser(user1);
+
+        User user2 = getUser3();
+        userStorage.createUser(user2);
+
+        users = userStorage.getUsersList();
         assertThat(users).isNotNull();
         assertThat(users.size()).isEqualTo(3);
     }
 
     @Test
-    public void testAddFriend() {
+    public void addFriendTest() {
         userStorage.addFriend(getUser1(), getUser2());
         assertThat(userStorage.getFriendsList(getUser1().getId()).size()).isEqualTo(1);
         assertThat(userStorage.getFriendsList(getUser2().getId()).size()).isEqualTo(0);

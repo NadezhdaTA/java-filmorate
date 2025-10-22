@@ -70,4 +70,10 @@ public class UserController {
         userService.deleteFriend(id, friendId);
         log.debug("Друг успешно удален.");
     }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable int userId) throws NotFoundException {
+        userService.deleteUser(userId);
+        log.debug("Пользователь успешно удален.");
+    }
 }

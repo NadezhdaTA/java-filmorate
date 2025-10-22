@@ -22,7 +22,7 @@ public class MpaDbStorageTest extends TestData {
     private final MpaDbStorage storage;
 
     @Test
-    public void testGetMpaRatingById() {
+    public void getMpaRatingByIdTest() {
         Optional<MpaRating> result = storage.getMpaRatingById(1);
 
         assertThat(result).isPresent();
@@ -30,7 +30,7 @@ public class MpaDbStorageTest extends TestData {
     }
 
     @Test
-    public void testGetAllMpaRatings() {
+    public void getAllMpaRatingsTest() {
         ArrayList<MpaRating> result = new ArrayList<>(storage.getAllMpaRatings());
 
         assertThat(result.size()).isEqualTo(5);

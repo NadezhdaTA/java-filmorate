@@ -15,7 +15,6 @@ public class FilmService {
     private final FilmDbStorage filmStorage;
 
     public FilmService (FilmDbStorage filmStorage) {
-
         this.filmStorage = filmStorage;
     }
 
@@ -47,6 +46,10 @@ public class FilmService {
 
     public Collection<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
+    }
+
+    public void deleteFilm(int filmId) {
+        filmStorage.deleteFilm(filmId);
     }
 
 }

@@ -8,6 +8,7 @@ merge into mpa_rating (mpa_id, mpa_rate)
     values((4), ('R'));
 merge into mpa_rating (mpa_id, mpa_rate)
     values((5), ('NC-17'));
+
 merge into genre (genre_id, genre_name)
     values((1), ('Комедия'));
 merge into genre (genre_id, genre_name)

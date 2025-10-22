@@ -1,4 +1,4 @@
-# java-filmorate
+# Java-filmorate
 Template repository for Filmorate project.
 
 ## BD-structure

@@ -75,4 +75,8 @@ public class UserService {
         userStorage.deleteFriend(user, friend);
     }
 
+    public void deleteUser(int id) {
+        userStorage.deleteUser(id);
+    }
+
 }

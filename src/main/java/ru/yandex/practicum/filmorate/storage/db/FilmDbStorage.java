@@ -27,54 +27,6 @@ public class FilmDbStorage extends FilmRowMapper implements FilmStorage {
     private final JdbcTemplate jdbc;
     private final FilmRowMapper mapper = new FilmRowMapper();
 
-    private void checkMpaRating(Film film) {
-        int mpaId = jdbc.queryForObject("SELECT COUNT(mpa_rate) FROM mpa_rating WHERE mpa_id = ?",
-                Integer.class, film.getMpaRating().getMpaId());
-        if (mpaId == 0) {
-            throw new NotFoundException("Неверный mpaId = " + film.getMpaRating().getMpaId());
-        }
-    }
-
-    private void checkGenre(Film film) {
-        for (Genre genre : film.getGenre()) {
-            int mpaId = jdbc.queryForObject("SELECT COUNT(genre_name) FROM genre WHERE genre_id = ?",
-                    Integer.class, genre.getGenreId());
-            if (mpaId == 0) {
-                throw new NotFoundException("Жанр с id = " + genre.getGenreId() + " не найден.");
-            }
-        }
-    }
-
-    private void getGenre(Film film) {
-        Set<Genre> genres = new HashSet<>(jdbc.query("SELECT g.genre_id, g.genre_name " +
-                        "FROM genre g JOIN genres gs on g.genre_id = gs.genre_id " +
-                        "WHERE film_id = ?", new GenreRowMapper(), film.getId()));
-        film.setGenre(genres);
-    }
-
-    private void setGenres(Film film) {
-        List<Genre> genres = new ArrayList<>(film.getGenre());
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-        jdbc.batchUpdate("INSERT INTO genres (film_id, genre_id) VALUES (?, ?)", new BatchPreparedStatementSetter() {
-
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setInt(1, film.getId());
-                ps.setInt(2, genres.get(i).getGenreId());
-
-            }
-
-            @Override
-                public int getBatchSize() {
-                return genres.size();
-            }
-        });
-        stopWatch.stop();
-    }
-
-
     @Override
     public Film createFilm(Film film) {
         checkMpaRating(film);
@@ -168,4 +120,63 @@ public class FilmDbStorage extends FilmRowMapper implements FilmStorage {
         }
         return films;
     }
+
+    @Override
+    public void deleteFilm(int filmId) {
+        int count = jdbc.queryForObject("SELECT COUNT(name) FROM films WHERE id = ?", Integer.class, filmId);
+        if (count > 0) {
+
+            jdbc.update("DELETE FROM films WHERE id = ?", filmId);
+        } else {
+            throw new NotFoundException("Фильм с таким d  не найден.");
+        }
+    }
+
+    private void checkMpaRating(Film film) {
+        int mpaId = jdbc.queryForObject("SELECT COUNT(mpa_rate) FROM mpa_rating WHERE mpa_id = ?",
+                Integer.class, film.getMpaRating().getMpaId());
+        if (mpaId == 0) {
+            throw new NotFoundException("Неверный mpaId = " + film.getMpaRating().getMpaId());
+        }
+    }
+
+    private void checkGenre(Film film) {
+        for (Genre genre : film.getGenre()) {
+            int mpaId = jdbc.queryForObject("SELECT COUNT(genre_name) FROM genre WHERE genre_id = ?",
+                    Integer.class, genre.getGenreId());
+            if (mpaId == 0) {
+                throw new NotFoundException("Жанр с id = " + genre.getGenreId() + " не найден.");
+            }
+        }
+    }
+
+    private void getGenre(Film film) {
+        Set<Genre> genres = new HashSet<>(jdbc.query("SELECT g.genre_id, g.genre_name " +
+                "FROM genre g JOIN genres gs on g.genre_id = gs.genre_id " +
+                "WHERE film_id = ? ORDER BY genre_id", new GenreRowMapper(), film.getId()));
+        film.setGenre(genres);
+    }
+
+    private void setGenres(Film film) {
+        List<Genre> genres = new ArrayList<>(film.getGenre());
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        jdbc.batchUpdate("INSERT INTO genres (film_id, genre_id) VALUES (?, ?)", new BatchPreparedStatementSetter() {
+
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, film.getId());
+                ps.setInt(2, genres.get(i).getGenreId());
+
+            }
+
+            @Override
+            public int getBatchSize() {
+                return genres.size();
+            }
+        });
+        stopWatch.stop();
+    }
+
 }

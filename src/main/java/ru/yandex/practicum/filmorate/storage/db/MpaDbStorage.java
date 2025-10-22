@@ -15,7 +15,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbc;
-    private final MpaRowMapper mapper = new MpaRowMapper();
 
     @Override
     public Optional<MpaRating> getMpaRatingById(int id) {

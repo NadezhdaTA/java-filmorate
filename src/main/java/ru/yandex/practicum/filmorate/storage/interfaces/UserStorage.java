@@ -4,11 +4,9 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 
 public interface UserStorage {
-    Map<Integer, User> users = Map.of();
 
     User createUser(User user);
 

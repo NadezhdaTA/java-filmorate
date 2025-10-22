@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface GenreStorage {
     Optional<Genre> getGenreById(int id);
+
     Collection<Genre> getAllGenres();
 }

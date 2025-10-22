@@ -21,7 +21,7 @@ public class GenreDbStorageTest extends TestData{
     private final GenreDbStorage storage;
 
     @Test
-    public void testGetGenreById() {
+    public void getGenreByIdTest() {
         Optional<Genre> genre = storage.getGenreById(3);
 
         assertThat(genre).isPresent();
@@ -29,7 +29,7 @@ public class GenreDbStorageTest extends TestData{
     }
 
     @Test
-    public void testGetAllGenres() {
+    public void getAllGenresTest() {
         ArrayList<Genre> genres = new ArrayList<>(storage.getAllGenres());
 
         assertThat(genres.size()).isEqualTo(6);

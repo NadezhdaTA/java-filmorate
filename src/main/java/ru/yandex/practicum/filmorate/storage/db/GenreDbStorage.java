@@ -14,7 +14,6 @@ import java.util.Optional;
 @Repository
 public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbc;
-    private final GenreRowMapper mapper = new GenreRowMapper();
 
     @Override
     public Optional<Genre> getGenreById(int id) {
