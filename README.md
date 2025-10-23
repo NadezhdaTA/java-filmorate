@@ -1,39 +1,41 @@
 # Java-filmorate
-Template repository for Filmorate project.
+Социальная сеть, где можно выбирать фильмы, основываясь на их рейтинге. А также можно подружится с другими пользователями и узнать, какие фильмы смотрят они.
+
+Приложение реализует следующие задачи:
+- поиск фильмов по их рейтингу;
+- возможность ставить/удалять лайк у фильма;
+- возможность подружиться с другим пользователями;
+- возможность просмотреть общих друзей с другим пользователем.
+
 
 ## BD-structure
 ![](/DB-Diagram.png)
 
+### Примеры SQL запросов
+
 Получение списка фильмов по рейтингу:
 ```
 SELECT f.film_id,
-       COUNT(l.user_id)
-FROM film AS f
+       COUNT(l.film_id)
+FROM films AS f
 INNER JOIN likes AS l ON f.film_id = l.film_id
 GROUP BY f.film_id
-ORDER BY COUNT(l.user_id) DESC;
+ORDER BY COUNT(l.film_id) DESC;
 ```
 
-Получение списка друзей пользователя:
+Получение списка друзей пользователей:
 ```
 SELECT u.user_id,
        fr.friend_id
-FROM user AS u
+FROM users AS u
 INNER JOIN friends AS fr ON u.user_id = fr.user_id
-GROUP BY u.user_id;
+ORDER BY u.user_id;
 ```
 
-Получение списка названий фильмов в жанре COMEDY по продолжительности:
-```
-SELECT f.name,
-       f.duration
-FROM film AS f
-JOIN film_genre AS fg ON f.film_id = fg.film_id
-JION genre AS g ON fg.genre_id = g.genre_id
-WHERE g.name = 'COMEDY'
-GROUP BY g.name
-ORDER BY f.duration;
-```
+Планируемы доработки:
+- реализовать фильтрацию фильмов по дате выхода, категориям;
+- реализовать возможность просматривать любимые фильмы друзей;
+- покрыть приложение тестами.
 
 
 
