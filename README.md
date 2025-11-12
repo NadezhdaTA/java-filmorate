@@ -1,5 +1,4 @@
 # java-filmorate
-Template repository for Filmorate project.
 
 ## BD-structure
 ![](/DB-Diagram.png)
